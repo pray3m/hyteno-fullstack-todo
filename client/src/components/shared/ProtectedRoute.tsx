@@ -10,10 +10,10 @@ const ProtectedRoute = ({ children }: Props) => {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" />;
   }
 
-  return <>{children}</>;
+  return children;
 };
 
 export default ProtectedRoute;

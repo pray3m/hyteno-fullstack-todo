@@ -1,10 +1,10 @@
-import Login from "@/layouts/Login";
+import { LoginForm } from "@/layouts/auth/LoginForm";
 import { FC } from "react";
 
 const LoginPage: FC = () => {
   return (
-    <div>
-      <Login />
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <LoginForm />
     </div>
   );
 };
