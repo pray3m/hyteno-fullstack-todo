@@ -9,6 +9,8 @@ import {
   UseGuards,
   UploadedFile,
   UseInterceptors,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
@@ -19,6 +21,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { User } from 'src/common/decorators/user.decorator';
+import { QueryTodoDto } from './dto/quey-todo.dto';
+import { User as UserType } from '@prisma/client';
 
 @Controller('todos')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -56,22 +60,26 @@ export class TodosController {
   }
 
   @Get()
-  findAll() {
-    return this.todosService.findAll();
+  findAll(@User('id') userId: number, @Query() query: QueryTodoDto) {
+    return this.todosService.findAll(userId, query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.todosService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.todosService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto) {
-    return this.todosService.update(+id, updateTodoDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateTodoDto: UpdateTodoDto,
+    @User() user: UserType,
+  ) {
+    return this.todosService.update(id, updateTodoDto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.todosService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number, @User() user: UserType) {
+    return this.todosService.remove(id, user);
   }
 }
