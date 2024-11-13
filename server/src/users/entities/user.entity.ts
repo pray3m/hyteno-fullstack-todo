@@ -9,6 +9,7 @@ export class UserEntity implements User {
   id: number;
   email: string;
   role: Role;
+  name: string;
 
   @Exclude()
   password: string;

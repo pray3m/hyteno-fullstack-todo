@@ -1,15 +1,15 @@
 import { Route, Routes } from "react-router-dom";
-import { Button } from "./components/ui/button";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
-import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
   return (
     <>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<Button>Register</Button>} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route
           path="/"
           element={
