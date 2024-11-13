@@ -27,4 +27,12 @@ export class CreateTodoDto {
   @IsEnum(Status)
   @IsOptional()
   status?: Status;
+
+  @IsOptional()
+  @IsString()
+  fileName?: string;
+
+  @IsOptional()
+  @IsString()
+  filePath?: string;
 }

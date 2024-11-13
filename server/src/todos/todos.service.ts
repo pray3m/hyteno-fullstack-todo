@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Todo, User as UserType } from '@prisma/client';
+import { User as UserType } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -18,20 +18,23 @@ export class TodosService {
    * @param userId - ID of the user creating the todo.
    * @param createTodoDto - Data for creating a todo.
    * @param file - Optional file attached to the todo.
+   * @param fileName - Optional original fileName
    * @returns The created todo.
    */
   async create(
     userId: number,
     createTodoDto: CreateTodoDto,
-    file?: Express.Multer.File,
-  ): Promise<Todo> {
+    imageUrl?: string,
+    publicId?: string,
+    fileName?: string,
+  ) {
     const todoData = {
       ...createTodoDto,
       userId,
-      ...(file && {
-        imageUrl: file.path,
-        fileName: file.originalname,
-        filePath: file.path,
+      ...(imageUrl && {
+        imageUrl,
+        fileName,
+        filePath: publicId,
       }),
     };
 
