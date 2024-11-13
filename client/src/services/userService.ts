@@ -1,12 +1,12 @@
 import axiosInstance from "@/lib/axios";
 
-interface RegisterData {
+interface CreateUserData {
   email: string;
   password: string;
   name: string;
 }
 
-export const register = async (data: RegisterData) => {
+export const createUser = async (data: CreateUserData) => {
   try {
     const response = await axiosInstance.post("/users", data);
 

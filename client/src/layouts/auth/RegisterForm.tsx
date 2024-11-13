@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { register } from "@/services/userService";
+import { register } from "@/services/authService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
