@@ -7,9 +7,12 @@ import { AuthModule } from './auth/auth.module';
 import { TodosModule } from './todos/todos.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     PrismaModule,
     UsersModule,
     AuthModule,
@@ -18,6 +21,7 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -13,12 +13,15 @@ import { UserEntity } from 'src/users/entities/user.entity';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { roundsOfHashing } from './constants';
+import { UserCreatedEvent } from 'src/notifications/events/user-created-event';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<User> {
@@ -38,9 +41,16 @@ export class AuthService {
     );
     createUserDto.password = hashedPassword;
 
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: createUserDto,
     });
+
+    this.eventEmitter.emit(
+      'user.created',
+      new UserCreatedEvent(user.id, user.name, user.email),
+    );
+
+    return user;
   }
 
   async login(loginAuthDto: LoginAuthDto): Promise<LoginResponseDto> {
