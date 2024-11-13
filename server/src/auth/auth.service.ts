@@ -4,10 +4,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthEntity } from './entity/auth.entity';
-import { LoginAuthDto } from './dto/login-auth.dto';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { LoginAuthDto } from './dto/login-auth.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(loginAuthDto: LoginAuthDto): Promise<AuthEntity> {
+  async login(loginAuthDto: LoginAuthDto): Promise<LoginResponseDto> {
     const { email, password } = loginAuthDto;
 
     // Step 1 : fetch a user with the given email
@@ -29,9 +30,13 @@ export class AuthService {
 
     if (!isPasswordValid) throw new UnauthorizedException('Invalid password');
 
-    // Step 3 : Generate a JWT containing the user's info and return it
+    // Step 3 : Generate JWT token
+    const accessToken = this.jwtService.sign({ sub: user.id });
+    const userEntity = new UserEntity(user);
+
     return {
-      accessToken: this.jwtService.sign({ sub: user.id }),
+      accessToken,
+      user: userEntity,
     };
   }
 }
