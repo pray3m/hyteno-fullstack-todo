@@ -1,4 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { User as UserType } from '@prisma/client';
 
 /**
  * Custom decorator to extract user information from the request.
@@ -8,7 +9,7 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
  */
 
 export const User = createParamDecorator(
-  (data: string, ctx: ExecutionContext) => {
+  (data: string, ctx: ExecutionContext): UserType => {
     const request = ctx.switchToHttp().getRequest();
     const user = request.user;
 

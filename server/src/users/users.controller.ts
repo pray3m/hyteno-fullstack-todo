@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   ParseIntPipe,
@@ -16,7 +17,8 @@ import { UserEntity } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { Role, User as UserType } from '@prisma/client';
+import { User } from 'src/common/decorators/user.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -38,9 +40,17 @@ export class UsersController {
 
   @Get(':id')
   @Roles(Role.ADMIN, Role.USER)
-  @UseGuards(JwtAuthGuard)
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return new UserEntity(await this.usersService.findOne(id));
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @User() currentUser: UserType,
+  ) {
+    if (currentUser.role !== Role.ADMIN && currentUser.id !== id) {
+      throw new ForbiddenException(
+        'You do not have permission to access this user',
+      );
+    }
+    const user = await this.usersService.findOne(id);
+    return new UserEntity(user);
   }
 
   @Patch(':id')
