@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/authStore";
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 
@@ -7,9 +7,9 @@ interface Props {
 }
 
 const ProtectedRoute = ({ children }: Props) => {
-  const { isAuthenticated } = useAuth();
+  const { accessToken } = useAuthStore();
 
-  if (!isAuthenticated) {
+  if (!accessToken) {
     return <Navigate to="/login" />;
   }
 

@@ -1,8 +1,4 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -19,17 +15,30 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useAuth } from "@/hooks/useAuth";
-import axiosInstance from "@/lib/axios";
+import { Input } from "@/components/ui/input";
+import { login } from "@/services/authService";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Lock, Mail } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import * as z from "zod";
 
 const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters long" }),
 });
 
-export function LoginForm() {
-  const { login } = useAuth();
-  const form = useForm<z.infer<typeof formSchema>>({
+type FormData = z.infer<typeof formSchema>;
+
+const LoginForm = () => {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -37,32 +46,36 @@ export function LoginForm() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const response = await axiosInstance.post("/auth/login", values);
+  async function onSubmit(values: FormData) {
+    setIsLoading(true);
 
-      if (response.status === 201) {
-        login(response.data.accessToken);
-      } else {
-        // Handle error
-        console.error(response.data.message);
-      }
-    } catch (error) {
-      console.error("Login failed:", error);
+    const result = await login(values);
+
+    setIsLoading(false);
+    if (result.success) {
+      toast.success("Welcome back!", {
+        description: "You've successfully logged in.",
+      });
+      navigate("/");
+    } else {
+      toast.error("Login failed", {
+        description:
+          result.message || "Please check your credentials and try again.",
+      });
     }
   }
 
   return (
     <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription>
-          Enter your credentials to access your account.
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
+        <CardDescription className="text-center">
+          Welcome back! Please sign in to continue.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="email"
@@ -70,7 +83,16 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="email@example.com" {...field} />
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="name@example.com"
+                        type="email"
+                        className="pl-10 h-11"
+                        disabled={isLoading}
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -83,26 +105,58 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Enter your password"
+                        type="password"
+                        className="pl-10 h-11"
+                        disabled={isLoading}
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
-              Login
+            <Button
+              type="submit"
+              className="w-full h-11 text-base font-medium"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign in"
+              )}
             </Button>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex justify-center">
-        <p className="text-sm text-muted-foreground">
+
+      <CardFooter className="flex flex-col space-y-2">
+        <div className="text-sm text-center text-muted-foreground">
           Don't have an account?{" "}
-          <a href="/register" className="text-primary hover:underline">
-            Register
+          <a
+            href="/register"
+            className="text-primary underline-offset-4 hover:underline"
+          >
+            Sign up
           </a>
-        </p>
+        </div>
+        {/* <a
+          href="/forgot-password"
+          className="text-sm text-center text-muted-foreground underline-offset-4 hover:underline"
+        >
+          Forgot your password?
+        </a> */}
       </CardFooter>
     </Card>
   );
-}
+};
+
+export default LoginForm;

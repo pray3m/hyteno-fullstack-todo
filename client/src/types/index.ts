@@ -16,10 +16,10 @@ export enum Status {
 
 export interface User {
   id: number;
-  name: string;
   email: string;
   role: Role;
-  avatar: string | null;
+  // name?: string;
+  avatar?: string | null;
 }
 
 export interface Todo {

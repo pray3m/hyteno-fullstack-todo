@@ -1,4 +1,4 @@
-import { LoginForm } from "@/layouts/auth/LoginForm";
+import LoginForm from "@/layouts/auth/LoginForm";
 import { FC } from "react";
 
 const LoginPage: FC = () => {

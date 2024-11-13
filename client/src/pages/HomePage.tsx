@@ -20,31 +20,37 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAuth } from "@/hooks/useAuth";
 import TaskList from "@/layouts/home/TaskList";
+import { logout } from "@/services/authService";
+import { useAuthStore } from "@/store/authStore";
 import { Role, User } from "@/types";
 import { LogOut, Users } from "lucide-react";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
-  const { user: currentUser, logout } = useAuth();
+  const { user: currentUser } = useAuthStore();
   const [users, setUsers] = useState<User[]>([
     {
       id: 1,
-      name: "John Doe",
       email: "john@example.com",
       role: Role.ADMIN,
       avatar: null,
     },
     {
       id: 2,
-      name: "Jane Smith",
       email: "jane@example.com",
       role: Role.USER,
       avatar: null,
     },
   ]);
   const [showUserManagement, setShowUserManagement] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   if (!currentUser) {
     return <div>Loading...</div>;
@@ -80,10 +86,10 @@ const HomePage: React.FC = () => {
                     <Avatar className="h-8 w-8">
                       <AvatarImage
                         src={currentUser.avatar || undefined}
-                        alt={currentUser.name}
+                        alt={currentUser.email}
                       />
                       <AvatarFallback>
-                        {currentUser.name.charAt(0)}
+                        {currentUser.email.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -92,7 +98,7 @@ const HomePage: React.FC = () => {
                   <DropdownMenuItem disabled>
                     Role: {currentUser.role}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={logout}>
+                  <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </DropdownMenuItem>
@@ -131,9 +137,11 @@ const HomePage: React.FC = () => {
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
                         <Avatar className="h-6 w-6">
-                          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>
+                            {user.email.charAt(0).toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
-                        {user.name}
+                        {user.email}
                       </div>
                     </TableCell>
                     <TableCell>{user.email}</TableCell>
