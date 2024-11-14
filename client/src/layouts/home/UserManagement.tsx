@@ -89,8 +89,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
                   <div className="flex items-center gap-2">
                     <Avatar className="h-6 w-6">
                       <AvatarImage
-                        src={user.avatar || undefined}
-                        alt={user.email}
+                        src={`https://avatar.vercel.sh/${currentUser?.email}.png`}
                       />
                       <AvatarFallback>
                         {user.email.charAt(0).toUpperCase()}

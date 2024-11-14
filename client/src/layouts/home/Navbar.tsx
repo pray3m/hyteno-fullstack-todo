@@ -150,8 +150,7 @@ const Navbar: React.FC<NavbarProps> = ({ setShowUserManagement }) => {
                 >
                   <Avatar className="h-9 w-9 border-2 border-gray-200">
                     <AvatarImage
-                      src={currentUser?.avatar || undefined}
-                      alt={currentUser?.email}
+                      src={`https://avatar.vercel.sh/${currentUser?.email}.png`}
                     />
                     <AvatarFallback className="bg-blue-100 text-blue-600">
                       {currentUser?.email.charAt(0).toUpperCase()}

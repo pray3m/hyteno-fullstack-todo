@@ -58,9 +58,13 @@ const LoginForm = () => {
       });
       navigate("/");
     } else {
+      const errorMessage =
+        "message" in result
+          ? result.message
+          : "Please check your credentials and try again.";
+
       toast.error("Login failed", {
-        description:
-          result.message || "Please check your credentials and try again.",
+        description: errorMessage,
       });
     }
   }
