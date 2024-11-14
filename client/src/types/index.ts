@@ -18,7 +18,7 @@ export interface User {
   id: number;
   email: string;
   role: Role;
-  // name?: string;
+  name: string;
   avatar?: string | null;
 }
 
