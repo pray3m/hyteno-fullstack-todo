@@ -1,44 +1,24 @@
-# Dockerfile
-
-# Stage 1: Builder
-FROM node:18-alpine AS builder
+# Use Node.js 20.11.1 base image
+FROM node:20.11.1-alpine
 
 # Set working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy package.json and yarn.lock for better caching
-COPY package.json yarn.lock ./
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-# Install all dependencies (including devDependencies for seeding)
-RUN yarn install --frozen-lockfile
+# Install dependencies
+RUN npm cache clean --force
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application code
 COPY . .
 
-# Generate Prisma Client
-RUN yarn prisma generate
+# Generate Prisma Client code
+RUN npx prisma generate
 
-# Build the NestJS application
-RUN yarn build
-
-# Stage 2: Production
-FROM node:18-alpine
-
-# Set working directory
-WORKDIR /usr/src/app
-
-# Copy package.json and yarn.lock
-COPY package.json yarn.lock ./
-
-# Install only production dependencies
-RUN yarn install --production --frozen-lockfile
-
-# Copy built application and Prisma folder from builder
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/prisma ./prisma
-
-# Expose the application port
+# Expose the port the app runs on, here, I was using port 3333
 EXPOSE 3000
 
-# Define the command to start the server
-CMD ["node", "dist/main"]
+# Command to run the app
+CMD [  "npm", "run", "start:migrate:prod" ]

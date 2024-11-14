@@ -1,37 +1,28 @@
 services:
 
-  postgres:
-    image: postgres:13.5
-    restart: always
+  # Database service using PostgreSQL image
+  database:
+    image: postgres:latest
     environment:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: hyteno_fullstack_todo
+    ports:
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
-    networks:
-      - app-network
+      - db-data:/var/lib/postgresql/data
+    restart: unless-stopped
 
+  # Backend service
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    env_file:
-      - ./.env
-    depends_on:
-      - postgres
+    build: .
     ports:
-      - '3100:3000' # Host:Container
-    networks:
-      - app-network
+      - "3100:3000" # Host : Container
+    depends_on:
+      - database # Ensure that the backend service starts after the database service is up and running
+    env_file:
+      - .env
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
-
-
-networks:
-  app-network:
-    driver: bridge
+  db-data:
