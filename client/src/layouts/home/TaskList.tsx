@@ -6,7 +6,7 @@ import {
   updateTodo,
 } from "@/services/todoService";
 import { Status, Todo, User, Priority } from "@/types";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import {
 import TodoForm, { TodoFormData } from "./TodoForm";
 import EmptyIllustration from "./EmptyIllustration";
 import TodoCard from "./TodoCard";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface TaskListProps {
   currentUser: User;
@@ -38,6 +39,7 @@ export default function TaskList({ currentUser }: TaskListProps) {
   const [showEditTodo, setShowEditTodo] = useState(false);
   const [todoToEdit, setTodoToEdit] = useState<Todo | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
     sortBy: "dueDate",
@@ -46,7 +48,6 @@ export default function TaskList({ currentUser }: TaskListProps) {
     priority: undefined as Priority | undefined,
   });
 
-  // Fetch todos from API based on filters
   useEffect(() => {
     const loadTodos = async () => {
       setLoading(true);
@@ -67,7 +68,6 @@ export default function TaskList({ currentUser }: TaskListProps) {
     loadTodos();
   }, [filters]);
 
-  // Debounced search filter
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       setFilters((prev) => ({ ...prev, search: searchTerm }));
@@ -143,106 +143,144 @@ export default function TaskList({ currentUser }: TaskListProps) {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Search and Filters */}
-      <div className="flex justify-between items-center mb-4">
-        <Input
-          type="text"
-          placeholder="Search tasks..."
-          onChange={handleSearchChange}
-          className="w-1/3"
-        />
-        <div className="flex items-center gap-2">
-          {/* Sort By */}
-          <Select
-            value={filters.sortBy}
-            onValueChange={(value) =>
-              setFilters((prev) => ({ ...prev, sortBy: value }))
-            }
+    <div className="space-y-6 p-4 max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="relative w-full md:w-1/3">
+          <Input
+            type="text"
+            placeholder="Search tasks..."
+            onChange={handleSearchChange}
+            className="pl-10 pr-4 py-2 w-full"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+        </div>
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <Button
+            onClick={() => setShowFilters(!showFilters)}
+            variant="outline"
+            className="w-full md:w-auto"
           >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort By" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="dueDate">Due Date</SelectItem>
-              <SelectItem value="priority">Priority</SelectItem>
-              <SelectItem value="createdAt">Created At</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Status Filter */}
-          <Select
-            value={filters.status}
-            onValueChange={(value) =>
-              setFilters((prev) => ({
-                ...prev,
-                status: value as Status | undefined,
-              }))
-            }
+            <SlidersHorizontal className="mr-2 h-4 w-4" />
+            Filters
+          </Button>
+          <Button
+            onClick={() => setShowAddTodo(true)}
+            className="w-full md:w-auto"
           >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={Status.TODO}>Todo</SelectItem>
-              <SelectItem value={Status.DONE}>Done</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Priority Filter */}
-          <Select
-            value={filters.priority}
-            onValueChange={(value) =>
-              setFilters((prev) => ({
-                ...prev,
-                priority: value as Priority | undefined,
-              }))
-            }
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by Priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={Priority.HIGH}>High</SelectItem>
-              <SelectItem value={Priority.MEDIUM}>Medium</SelectItem>
-              <SelectItem value={Priority.LOW}>Low</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Add New Task Button */}
-          <Button onClick={() => setShowAddTodo(true)} variant="secondary">
             <Plus className="mr-2 h-4 w-4" /> New Task
           </Button>
         </div>
       </div>
 
-      {/* Loading Indicator */}
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="flex flex-wrap gap-4 items-center bg-secondary p-4 rounded-lg">
+              <Select
+                value={filters.sortBy}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({ ...prev, sortBy: value }))
+                }
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Sort By" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="dueDate">Due Date</SelectItem>
+                  <SelectItem value="priority">Priority</SelectItem>
+                  <SelectItem value="createdAt">Created At</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={filters.status}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    status: value as Status | undefined,
+                  }))
+                }
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={Status.TODO}>Todo</SelectItem>
+                  <SelectItem value={Status.DONE}>Done</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={filters.priority}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    priority: value as Priority | undefined,
+                  }))
+                }
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={Priority.HIGH}>High</SelectItem>
+                  <SelectItem value={Priority.MEDIUM}>Medium</SelectItem>
+                  <SelectItem value={Priority.LOW}>Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {loading ? (
-        <div className="flex justify-center my-4">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <div className="flex justify-center my-8">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : todos.length === 0 ? (
-        /* Empty State Illustration */
-        <div className="flex justify-center my-8">
+        <div className="flex flex-col items-center justify-center my-16">
           <EmptyIllustration />
+          <h2 className="text-2xl font-semibold mb-2">No tasks found</h2>
+          <p className="text-muted-foreground mb-4">
+            Start by adding a new task or adjusting your filters.
+          </p>
+          <Button onClick={() => setShowAddTodo(true)}>
+            <Plus className="mr-2 h-4 w-4" /> Add Your First Task
+          </Button>
         </div>
       ) : (
-        /* Todo List */
-        <div className="grid gap-4">
+        <motion.div
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ staggerChildren: 0.1 }}
+        >
           {todos.map((todo) => (
-            <TodoCard
+            <motion.div
               key={todo.id}
-              todo={todo}
-              currentUser={currentUser}
-              onEdit={openEditModal}
-              onMarkAsDone={handleMarkAsDone}
-              onDelete={handleDeleteTodo}
-            />
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <TodoCard
+                todo={todo}
+                currentUser={currentUser}
+                onEdit={openEditModal}
+                onMarkAsDone={handleMarkAsDone}
+                onDelete={handleDeleteTodo}
+              />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
 
-      {/* Add Todo Modal */}
       <Dialog open={showAddTodo} onOpenChange={setShowAddTodo}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -252,7 +290,6 @@ export default function TaskList({ currentUser }: TaskListProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Todo Modal */}
       {todoToEdit && (
         <Dialog open={showEditTodo} onOpenChange={setShowEditTodo}>
           <DialogContent className="sm:max-w-[425px]">

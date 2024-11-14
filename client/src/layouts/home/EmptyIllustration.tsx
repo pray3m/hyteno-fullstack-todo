@@ -1,5 +1,3 @@
-// src/components/EmptyIllustration.tsx
-
 export default function EmptyIllustration() {
   return (
     <div className="flex flex-col items-center text-center text-gray-500">
@@ -10,7 +8,6 @@ export default function EmptyIllustration() {
         viewBox="0 0 24 24"
         stroke="currentColor"
       >
-        {/* Example SVG Illustration */}
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -24,7 +21,6 @@ export default function EmptyIllustration() {
           d="M3 7l9 5 9-5"
         />
       </svg>
-      <p className="text-lg">No todos available.</p>
     </div>
   );
 }
