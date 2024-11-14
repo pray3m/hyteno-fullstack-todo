@@ -3,12 +3,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Role, Status, Todo, User as UserType } from "@/types";
 import { format } from "date-fns";
-import { Badge, Calendar, CheckCircle, Trash2 } from "lucide-react";
+import {
+  Badge,
+  Calendar,
+  CheckCircle,
+  Trash2,
+  Edit3,
+  PaperclipIcon,
+} from "lucide-react";
 
 interface TodoCardProps {
   todo: Todo;
   currentUser: UserType;
-  onEdit: (todoId: number, updatedTodoData: Partial<Todo>) => void;
+  onEdit: (todo: Todo) => void;
+  onMarkAsDone: (todo: Todo) => void;
   onDelete: (todoId: number) => void;
 }
 
@@ -16,6 +24,7 @@ export default function TodoCard({
   todo,
   currentUser,
   onEdit,
+  onMarkAsDone,
   onDelete,
 }: TodoCardProps) {
   const isOwner = todo.userId === currentUser.id;
@@ -28,9 +37,15 @@ export default function TodoCard({
     LOW: "text-green-600 bg-green-50",
   };
 
+  const statusStyles = {
+    [Status.TODO]: "bg-blue-50 text-blue-600",
+    [Status.DONE]: "bg-green-50 text-green-600",
+  };
+
   return (
-    <Card className="relative p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-200">
-      <CardContent className="flex flex-col space-y-4">
+    <Card className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-200">
+      <CardContent className="space-y-3">
+        {/* Header: Avatar and Title */}
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-3">
             <Avatar className="h-10 w-10 bg-gray-200 text-gray-700">
@@ -38,7 +53,7 @@ export default function TodoCard({
                 src={`https://avatar.vercel.sh/${todo.user?.email}.png`}
               />
               <AvatarFallback>
-                {todo.user?.name ? todo.user.name.charAt(0).toUpperCase() : "U"}
+                {todo.user?.name?.charAt(0).toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -46,15 +61,25 @@ export default function TodoCard({
                 {todo.title}
               </h3>
               <p className="text-xs text-gray-500">
-                {todo.user?.name || "Unknown User"}
+                Created by: {todo.user?.name || "Unknown"}
               </p>
             </div>
           </div>
           {canModify && (
             <div className="flex space-x-2">
+              {/* Edit Button */}
+              <Button
+                onClick={() => onEdit(todo)}
+                variant="outline"
+                className="text-blue-600 border-blue-600"
+              >
+                <Edit3 className="mr-1 h-4 w-4" />
+                Edit
+              </Button>
+              {/* Mark as Done Button */}
               {todo.status === Status.TODO && (
                 <Button
-                  onClick={() => onEdit(todo.id, { status: Status.DONE })}
+                  onClick={() => onMarkAsDone(todo)}
                   variant="outline"
                   className="text-green-600 border-green-600"
                 >
@@ -62,6 +87,7 @@ export default function TodoCard({
                   Mark as Done
                 </Button>
               )}
+              {/* Delete Button */}
               <Button
                 onClick={() => onDelete(todo.id)}
                 variant="outline"
@@ -74,27 +100,52 @@ export default function TodoCard({
           )}
         </div>
 
+        {/* Description */}
         <p className="text-sm text-gray-700">{todo.description}</p>
 
-        <div className="flex items-center justify-between text-sm text-gray-500">
+        {/* Details: Due Date and Priority */}
+        <div className="flex justify-between items-center text-sm text-gray-500">
+          {/* Due Date */}
           <div className="flex items-center space-x-1">
-            <Calendar className="h-4 w-4" />
+            <Calendar className="h-4 w-4 text-gray-500" />
             <span>Due: {format(new Date(todo.dueDate), "MMM dd, yyyy")}</span>
           </div>
-          <Badge className={priorityStyles[todo.priority]}>
+          {/* Priority Badge */}
+          <Badge
+            className={`${
+              priorityStyles[todo.priority]
+            } px-2 py-1 rounded-lg text-xs`}
+          >
             Priority: {todo.priority}
           </Badge>
         </div>
 
+        {/* Status Badge */}
         <Badge
-          className={`${
-            todo.status === Status.DONE
-              ? "bg-green-50 text-green-600"
-              : "bg-blue-50 text-blue-600"
-          } mt-2 text-sm`}
+          className={`px-2 py-1 rounded-lg text-xs ${
+            statusStyles[todo.status]
+          }`}
         >
-          Status: {todo.status === Status.DONE ? "Done" : "Todo"}
+          {todo.status === Status.DONE ? "Done" : "Todo"}
         </Badge>
+
+        {/* Attachments */}
+        {todo.imageUrl && todo.fileName && (
+          <div className="flex items-center space-x-2">
+            <PaperclipIcon className="h-4 w-4 text-gray-500" />
+            <a
+              href={todo.imageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-blue-600 hover:underline truncate max-w-[120px]"
+              title={todo.fileName || "Attachment"}
+            >
+              {todo.fileName?.length > 15
+                ? `${todo.fileName.slice(0, 12)}...`
+                : todo.fileName}
+            </a>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

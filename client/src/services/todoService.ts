@@ -49,6 +49,7 @@ export const getTodos = async (params = {}) => {
 
 export const updateTodo = async (id: number, data: Partial<TodoData>) => {
   try {
+    if (data.file) delete data.file;
     const response = await axiosInstance.patch(`/todos/${id}`, data);
     return { success: true, data: response.data };
   } catch (error) {

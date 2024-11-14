@@ -9,8 +9,6 @@ import { Status, Todo, User, Priority } from "@/types";
 import { Loader2, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import TodoCard from "./TodoCard";
-import AddTodoForm, { FormData } from "./TodoForm";
 import { Button } from "@/components/ui/button";
 import {
   DialogHeader,
@@ -25,6 +23,9 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import TodoForm, { TodoFormData } from "./TodoForm";
+import EmptyIllustration from "./EmptyIllustration";
+import TodoCard from "./TodoCard";
 
 interface TaskListProps {
   currentUser: User;
@@ -34,6 +35,8 @@ export default function TaskList({ currentUser }: TaskListProps) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);
   const [showAddTodo, setShowAddTodo] = useState(false);
+  const [showEditTodo, setShowEditTodo] = useState(false);
+  const [todoToEdit, setTodoToEdit] = useState<Todo | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     search: "",
@@ -43,6 +46,7 @@ export default function TaskList({ currentUser }: TaskListProps) {
     priority: undefined as Priority | undefined,
   });
 
+  // Fetch todos from API based on filters
   useEffect(() => {
     const loadTodos = async () => {
       setLoading(true);
@@ -63,6 +67,7 @@ export default function TaskList({ currentUser }: TaskListProps) {
     loadTodos();
   }, [filters]);
 
+  // Debounced search filter
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       setFilters((prev) => ({ ...prev, search: searchTerm }));
@@ -75,9 +80,9 @@ export default function TaskList({ currentUser }: TaskListProps) {
     setSearchTerm(e.target.value);
   };
 
-  const handleAddTodo = async (todoData: FormData) => {
+  const handleAddTodo = async (todoData: TodoFormData, file?: File) => {
     try {
-      const response = await createTodo(todoData);
+      const response = await createTodo({ ...todoData, file });
       if (response.success) {
         setTodos((prev) => [...prev, response.data]);
         toast.success("Todo added successfully");
@@ -88,7 +93,7 @@ export default function TaskList({ currentUser }: TaskListProps) {
     }
   };
 
-  const handleEditTodo = async (id: number, updateData: Partial<Todo>) => {
+  const handleEditTodo = async (id: number, updateData: TodoFormData) => {
     try {
       const response = await updateTodo(id, updateData);
       if (response.success) {
@@ -98,9 +103,25 @@ export default function TaskList({ currentUser }: TaskListProps) {
           )
         );
         toast.success("Task updated");
+        setShowEditTodo(false);
+        setTodoToEdit(null);
       }
     } catch {
       toast.error("Error updating task");
+    }
+  };
+
+  const handleMarkAsDone = async (todo: Todo) => {
+    try {
+      const response = await updateTodo(todo.id, { status: Status.DONE });
+      if (response.success) {
+        setTodos((prev) =>
+          prev.map((t) => (t.id === todo.id ? { ...t, ...response.data } : t))
+        );
+        toast.success("Task marked as done");
+      }
+    } catch {
+      toast.error("Error marking task as done");
     }
   };
 
@@ -116,8 +137,14 @@ export default function TaskList({ currentUser }: TaskListProps) {
     }
   };
 
+  const openEditModal = (todo: Todo) => {
+    setTodoToEdit(todo);
+    setShowEditTodo(true);
+  };
+
   return (
     <div className="space-y-4">
+      {/* Search and Filters */}
       <div className="flex justify-between items-center mb-4">
         <Input
           type="text"
@@ -126,6 +153,7 @@ export default function TaskList({ currentUser }: TaskListProps) {
           className="w-1/3"
         />
         <div className="flex items-center gap-2">
+          {/* Sort By */}
           <Select
             value={filters.sortBy}
             onValueChange={(value) =>
@@ -181,38 +209,71 @@ export default function TaskList({ currentUser }: TaskListProps) {
             </SelectContent>
           </Select>
 
+          {/* Add New Task Button */}
           <Button onClick={() => setShowAddTodo(true)} variant="secondary">
             <Plus className="mr-2 h-4 w-4" /> New Task
           </Button>
         </div>
       </div>
 
+      {/* Loading Indicator */}
       {loading ? (
         <div className="flex justify-center my-4">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
+      ) : todos.length === 0 ? (
+        /* Empty State Illustration */
+        <div className="flex justify-center my-8">
+          <EmptyIllustration />
+        </div>
       ) : (
+        /* Todo List */
         <div className="grid gap-4">
           {todos.map((todo) => (
             <TodoCard
               key={todo.id}
               todo={todo}
               currentUser={currentUser}
-              onEdit={handleEditTodo}
+              onEdit={openEditModal}
+              onMarkAsDone={handleMarkAsDone}
               onDelete={handleDeleteTodo}
             />
           ))}
         </div>
       )}
 
+      {/* Add Todo Modal */}
       <Dialog open={showAddTodo} onOpenChange={setShowAddTodo}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Add New Todo</DialogTitle>
           </DialogHeader>
-          <AddTodoForm onAdd={handleAddTodo} />
+          <TodoForm onSubmit={handleAddTodo} />
         </DialogContent>
       </Dialog>
+
+      {/* Edit Todo Modal */}
+      {todoToEdit && (
+        <Dialog open={showEditTodo} onOpenChange={setShowEditTodo}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Todo</DialogTitle>
+            </DialogHeader>
+            <TodoForm
+              initialData={{
+                title: todoToEdit.title,
+                description: todoToEdit.description,
+                dueDate: todoToEdit.dueDate,
+                priority: todoToEdit.priority,
+              }}
+              onSubmit={async (data) => {
+                await handleEditTodo(todoToEdit.id, data);
+              }}
+              isEdit={true}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
