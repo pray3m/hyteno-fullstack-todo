@@ -18,11 +18,11 @@ services:
 
   backend:
     build:
-      context: ./server
+      context: .
       dockerfile: Dockerfile
     restart: always
     env_file:
-      - ./server/.env
+      - .env
     depends_on:
       - postgres
     ports:
