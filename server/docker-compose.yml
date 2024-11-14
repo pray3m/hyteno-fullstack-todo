@@ -1,17 +1,42 @@
 version: '3.8'
+
 services:
 
   postgres:
     image: postgres:13.5
     restart: always
     environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
-      - POSTGRES_DB=hyteno_fullstack_todo
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: hyteno_fullstack_todo
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+    networks:
+      - app-network
+
+  backend:
+    build: .
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    ports:
+      - '3100:3000' # Host:Container
+    networks:
+      - app-network
+    command: >
+      sh -c "
+        yarn prisma migrate deploy &&
+        node dist/main
+      "
 
 volumes:
-  postgres:
+  postgres_data:
+
+
+networks:
+  app-network:
+    driver: bridge
