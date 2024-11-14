@@ -1,33 +1,36 @@
-# Hyteno Fullstack Todo Application
+# 📝 Hyteno Fullstack Todo Application
 
-A feature-rich Todo app with Role-Based Access Control (RBAC), file uploads, search & filter, and notifications. Frontend deployed on Vercel and backend on a VPS.
+A slick Todo app with Role-Based Access Control (RBAC), file uploads, search & filter, and notifications developed using React, NestJS, and PostgreSQL deployed on Vercel and a VPS.
 
-## Live URLs
+## 🚀 Live URLs
 
 - **Frontend:** [hyteno-fullstack-todo.vercel.app](https://hyteno-fullstack-todo.vercel.app/)
 - **Backend:** [hy.petgomania.com.co](https://hy.petgomania.com.co)
 
-## Features
+> 🚢 The backend is proudly hosted on a subdomain of my freelance client's VPS, showcasing a smooth deployment and reliable performance .
+
+## ✨ Features
 
 - **User Authentication & RBAC**
-  - Admin and User roles
+  - **Admin:** Manage all users and their todos.
+  - **User:** Manage own todos and view all todos.
 - **Todo Management**
-  - Create, read, update, delete todos
-  - File uploads for todos
+  - Create, read, update, delete todos.
+  - Upload files for todos.
 - **Search, Sort & Filter**
-  - Search by title and description
-  - Sort by due date
-  - Filter by status and creation date
+  - Search by title and description.
+  - Sort by due date.
+  - Filter by status and creation date.
 - **Notifications**
-  - Welcome notification on user creation
+  - Receive a welcome notification upon registration.
 
-## Tech Stack
+## 🛠 Tech Stack
 
 - **Frontend:** React (Vite), Tailwind CSS, shadcn UI, Zustand, Axios
 - **Backend:** NestJS, Prisma, PostgreSQL, JWT, Cloudinary
 - **DevOps:** Docker, Docker Compose, Nginx (reverse proxy), Vercel, VPS
 
-## Setup Development Environment
+## 💻 Setup Development Environment
 
 ### Prerequisites
 
@@ -44,7 +47,6 @@ A feature-rich Todo app with Role-Based Access Control (RBAC), file uploads, sea
    cd hyteno-fullstack-todo/client
    cp .env.example .env.local
    ```
-````
 
 2. **Install Dependencies**
 
@@ -104,27 +106,30 @@ A feature-rich Todo app with Role-Based Access Control (RBAC), file uploads, sea
    yarn start:dev
    ```
 
-## Deployment
+## 📸 Project Screenshots
 
-- **Frontend:** Deployed on Vercel at [hyteno-fullstack-todo.vercel.app](https://hyteno-fullstack-todo.vercel.app/)
-- **Backend:** Deployed on VPS at [hy.petgomania.com.co](https://hy.petgomania.com.co)
+![Dashboard](./screenshots/dashboard.png)
 
-## Quick Commands
+![Todo List](./screenshots/todo-list.png)
 
-- **Frontend**
+![File Upload](./screenshots/file-upload.png)
 
-  - Install: `yarn install`
-  - Start: `yarn dev`
-  - Build: `yarn build`
+![Notifications](./screenshots/notifications.png)
 
-- **Backend**
-  - Install: `yarn install`
-  - Migrate: `npx prisma migrate deploy`
-  - Seed: `npx prisma db seed`
-  - Start: `yarn start:dev`
-  - Docker Compose: `docker-compose up -d --build`
+## 🔑 Admin & User Credentials
 
-## Contact
+- **Admin**
+
+  - **Email:** admin@hy.petgomania.com.co
+  - **Password:** AdminPass123!
+
+- **User**
+  - **Email:** user@hy.petgomania.com.co
+  - **Password:** UserPass123!
+
+> _These credentials are seeded for testing purposes. Feel free to create your own!_
+
+## 📫 Contact
 
 For questions or support, email [prem.gtm9@gmail.com](mailto:prem.gtm9@gmail.com).
 
