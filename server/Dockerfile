@@ -4,12 +4,13 @@ FROM node:20.11.1-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copy package.json and yarn.lock
+COPY package.json ./
+COPY yarn.lock ./
 
 # Install dependencies
-RUN npm cache clean --force
-RUN npm install --legacy-peer-deps
+RUN yarn cache clean --force
+RUN yarn install --legacy-peer-deps
 
 # Copy the rest of the application code
 COPY . .
@@ -17,8 +18,11 @@ COPY . .
 # Generate Prisma Client code
 RUN npx prisma generate
 
-# Expose the port the app runs on, here, I was using port 3333
+# Build
+RUN yarn build
+
+# Expose the port the app runs on
 EXPOSE 3000
 
 # Command to run the app
-CMD [  "npm", "run", "start:migrate:prod" ]
+CMD ["yarn", "start:migrate:prod"]

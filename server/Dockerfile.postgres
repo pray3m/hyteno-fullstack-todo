@@ -2,9 +2,9 @@
 FROM postgres:latest
 
 # Set environment variables used in prisma service
-ENV POSTGRES_DB = databasename 
-ENV POSTGRES_USER = username
-ENV POSTGRES_PASSWORD = password
+ENV POSTGRES_DB = hyteno_fullstack_todo 
+ENV POSTGRES_USER = myuser
+ENV POSTGRES_PASSWORD = mypassword
 
 # Expose the PostgreSQL port
 EXPOSE 5432

@@ -4,25 +4,26 @@ services:
   database:
     image: postgres:latest
     environment:
+      POSTGRES_DB: hyteno_fullstack_todo
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: hyteno_fullstack_todo
     ports:
       - "5432:5432"
     volumes:
-      - db-data:/var/lib/postgresql/data
-    restart: unless-stopped
+      - database:/var/lib/postgresql/data
 
   # Backend service
   backend:
     build: .
+    image: hyteno-todo-api
     ports:
       - "3100:3000" # Host : Container
     depends_on:
-      - database # Ensure that the backend service starts after the database service is up and running
+      - database 
     env_file:
       - .env
     restart: unless-stopped
 
 volumes:
-  db-data:
+  database:
+    name: hyteno_fullstack_todo_db
