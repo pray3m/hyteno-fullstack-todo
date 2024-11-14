@@ -25,33 +25,28 @@ async function main() {
   ];
 
   for (const user of users) {
-    // Check if the user already exists
-    const existingUser = await prisma.user.findUnique({
+    // Hash the user's password
+    const hashedPassword = await bcrypt.hash(user.password, roundsOfHashing);
+
+    // Upsert the user in the database
+    const upsertedUser = await prisma.user.upsert({
       where: { email: user.email },
+      update: {
+        name: user.name,
+        password: hashedPassword,
+        role: user.role,
+      },
+      create: {
+        email: user.email,
+        name: user.name,
+        password: hashedPassword,
+        role: user.role,
+      },
     });
 
-    if (!existingUser) {
-      // Hash the user's password
-      const hashedPassword = await bcrypt.hash(user.password, roundsOfHashing);
-
-      // Create the user in the database
-      const createdUser = await prisma.user.create({
-        data: {
-          email: user.email,
-          name: user.name,
-          password: hashedPassword,
-          role: user.role,
-        },
-      });
-
-      console.log(
-        `Created user: ${createdUser.email} with role ${createdUser.role}`,
-      );
-    } else {
-      console.log(
-        `User already exists: ${existingUser.email} with role ${existingUser.role}`,
-      );
-    }
+    console.log(
+      `Upserted user: ${upsertedUser.email} with role ${upsertedUser.role}`,
+    );
   }
 }
 

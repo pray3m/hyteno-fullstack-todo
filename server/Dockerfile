@@ -1,10 +1,12 @@
+# Dockerfile
+
 # Stage 1: Builder
 FROM node:18-alpine AS builder
 
 # Set working directory
 WORKDIR /usr/src/app
 
-# Copy package.json and yarn.lock for caching
+# Copy package.json and yarn.lock for better caching
 COPY package.json yarn.lock ./
 
 # Install all dependencies (including devDependencies for seeding)
@@ -35,14 +37,8 @@ RUN yarn install --production --frozen-lockfile
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/prisma ./prisma
 
-# Copy seed script
-COPY --from=builder /usr/src/app/prisma/seed.ts ./prisma/seed.ts
-
-# Install ts-node for running the seed script
-RUN yarn add ts-node
-
 # Expose the application port
 EXPOSE 3000
 
-# Define the default command
+# Define the command to start the server
 CMD ["node", "dist/main"]
