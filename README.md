@@ -9,6 +9,19 @@ A slick Todo app with Role-Based Access Control (RBAC), file uploads, search & f
 
 > 🚢 The backend is proudly hosted on a subdomain of my freelance client's VPS, showcasing a smooth deployment and reliable performance .
 
+## 🔑 Admin & User Credentials
+
+- **Admin**
+
+  - **Email:** admin@hy.petgomania.com.co
+  - **Password:** password
+
+- **User**
+  - **Email:** user@hy.petgomania.com.co
+  - **Password:** password
+
+> _These credentials are seeded for testing purposes. Feel free to create your own!_
+
 ## ✨ Features
 
 - **User Authentication & RBAC**
@@ -115,19 +128,6 @@ A slick Todo app with Role-Based Access Control (RBAC), file uploads, search & f
 ![File Upload](./screenshots/file-upload.png)
 
 ![Notifications](./screenshots/notifications.png)
-
-## 🔑 Admin & User Credentials
-
-- **Admin**
-
-  - **Email:** admin@hy.petgomania.com.co
-  - **Password:** AdminPass123!
-
-- **User**
-  - **Email:** user@hy.petgomania.com.co
-  - **Password:** UserPass123!
-
-> _These credentials are seeded for testing purposes. Feel free to create your own!_
 
 ## 📫 Contact
 
