@@ -14,7 +14,7 @@ export class UpdateTodoDto extends PartialType(CreateTodoDto) {
 
   @IsOptional()
   @IsDateString()
-  dueDate?: Date;
+  dueDate?: string;
 
   @IsOptional()
   @IsEnum(Priority)

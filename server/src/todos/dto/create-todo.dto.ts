@@ -1,11 +1,11 @@
+import { Priority, Status } from '@prisma/client';
 import {
-  IsNotEmpty,
-  IsString,
   IsDateString,
   IsEnum,
+  IsNotEmpty,
   IsOptional,
+  IsString,
 } from 'class-validator';
-import { Priority, Status } from '@prisma/client';
 
 export class CreateTodoDto {
   @IsNotEmpty()
@@ -18,7 +18,7 @@ export class CreateTodoDto {
 
   @IsNotEmpty()
   @IsDateString()
-  dueDate: Date;
+  dueDate: string;
 
   @IsEnum(Priority)
   @IsOptional()

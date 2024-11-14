@@ -26,17 +26,19 @@ export interface Todo {
   id: number;
   title: string;
   description: string;
-  dueDate: string; // ISO string
+  dueDate: string;
   priority: Priority;
   status: Status;
   attachment?: string | null;
+  imageUrl?: string | null;
   filePath?: string | null;
-  owner: User;
+  createdAt?: string;
+  user?: User;
 }
 
 export interface Notification {
   id: number;
   message: string;
   isRead: boolean;
-  createdAt: string; // ISO string
+  createdAt: string;
 }

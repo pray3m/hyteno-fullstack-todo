@@ -28,9 +28,12 @@ export class TodosService {
     publicId?: string,
     fileName?: string,
   ) {
+    const dueDate = new Date(createTodoDto.dueDate).toISOString();
+
     const todoData = {
       ...createTodoDto,
       userId,
+      dueDate,
       ...(imageUrl && {
         imageUrl,
         fileName,
@@ -127,7 +130,7 @@ export class TodosService {
       data: {
         ...updateTodoDto,
         dueDate: updateTodoDto.dueDate
-          ? new Date(updateTodoDto.dueDate)
+          ? new Date(updateTodoDto.dueDate).toISOString()
           : undefined,
       },
       include: {
