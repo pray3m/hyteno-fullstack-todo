@@ -17,10 +17,12 @@ services:
       - app-network
 
   backend:
-    build: .
+    build:
+      context: ./server
+      dockerfile: Dockerfile
     restart: always
     env_file:
-      - .env
+      - ./server/.env
     depends_on:
       - postgres
     ports:
@@ -30,7 +32,7 @@ services:
     command: >
       sh -c "
         yarn prisma migrate deploy &&
-        yarn prisma db seed  &&
+        yarn prisma db seed &&
         node dist/main
       "
 
