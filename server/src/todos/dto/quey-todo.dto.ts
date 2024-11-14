@@ -1,4 +1,4 @@
-import { Status } from '@prisma/client';
+import { Priority, Status } from '@prisma/client';
 import { IsOptional, IsString, IsEnum, IsDateString } from 'class-validator';
 
 export class QueryTodoDto {
@@ -9,6 +9,10 @@ export class QueryTodoDto {
   @IsOptional()
   @IsEnum(Status)
   status?: Status;
+
+  @IsOptional()
+  @IsEnum(Priority)
+  priority?: Priority;
 
   @IsOptional()
   @IsDateString()

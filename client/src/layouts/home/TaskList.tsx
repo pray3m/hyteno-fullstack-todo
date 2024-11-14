@@ -1,269 +1,218 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  createTodo,
+  deleteTodo,
+  getTodos,
+  updateTodo,
+} from "@/services/todoService";
+import { Status, Todo, User, Priority } from "@/types";
+import { Loader2, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import TodoCard from "./TodoCard";
+import AddTodoForm, { FormData } from "./TodoForm";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
+  DialogHeader,
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Priority, Role, Status, Todo, User } from "@/types";
-import { CalendarIcon, PaperclipIcon } from "lucide-react";
-import React, { useState } from "react";
-import AddTodoForm from "./TodoForm";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 interface TaskListProps {
   currentUser: User;
 }
 
-const TaskList: React.FC<TaskListProps> = ({ currentUser }) => {
-  const [todos, setTodos] = useState<Todo[]>([
-    {
-      id: 1,
-      title: "Complete Project Documentation",
-      description: "Write detailed documentation for the MERN stack project",
-      dueDate: "2024-11-14",
-      priority: Priority.HIGH,
-      status: Status.TODO,
-      attachment: "doc.pdf",
-      filePath: "/files/doc.pdf",
-      owner: {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        role: Role.ADMIN,
-        avatar: null,
-      },
-    },
-    {
-      id: 2,
-      title: "Review Pull Requests",
-      description: "Review and merge team PRs",
-      dueDate: "2024-11-15",
-      priority: Priority.MEDIUM,
-      status: Status.TODO,
-      attachment: null,
-      owner: {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        role: Role.USER,
-        avatar: null,
-      },
-    },
-  ]);
-
-  const [notifications, setNotifications] = useState<string[]>([
-    "Welcome to the Todo Manager!",
-    "Your account has been updated.",
-  ]);
-
+export default function TaskList({ currentUser }: TaskListProps) {
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [loading, setLoading] = useState(false);
   const [showAddTodo, setShowAddTodo] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortOption, setSortOption] = useState<string>("");
-  const [filterOption, setFilterOption] = useState<string>("");
-
-  // Filter, Search, and Sort Logic
-  const filteredTodos = todos.filter((todo) => {
-    const matchesSearch =
-      todo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      todo.description.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesFilter =
-      filterOption === ""
-        ? true
-        : filterOption === "status"
-        ? todo.status === Status.DONE || todo.status === Status.TODO
-        : new Date(todo.createdAt).toDateString() === new Date().toDateString(); // Example for creation date filter
-
-    return matchesSearch && matchesFilter;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({
+    search: "",
+    sortBy: "dueDate",
+    sortOrder: "asc",
+    status: undefined as Status | undefined,
+    priority: undefined as Priority | undefined,
   });
 
-  const sortedTodos = [...filteredTodos].sort((a, b) => {
-    if (sortOption === "dueDate") {
-      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-    } else if (sortOption === "priority") {
-      return (
-        Object.values(Priority).indexOf(a.priority) -
-        Object.values(Priority).indexOf(b.priority)
-      );
+  useEffect(() => {
+    const loadTodos = async () => {
+      setLoading(true);
+      try {
+        const response = await getTodos(filters);
+        if (response.success) {
+          setTodos(response.data);
+        } else {
+          toast.error("Failed to load tasks");
+        }
+      } catch {
+        toast.error("Error loading tasks");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTodos();
+  }, [filters]);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: searchTerm }));
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleAddTodo = async (todoData: FormData) => {
+    try {
+      const response = await createTodo(todoData);
+      if (response.success) {
+        setTodos((prev) => [...prev, response.data]);
+        toast.success("Todo added successfully");
+        setShowAddTodo(false);
+      }
+    } catch {
+      toast.error("Error adding task");
     }
-    return 0;
-  });
-
-  const isOwner = (todo: Todo) => todo.owner.id === currentUser.id;
-
-  const canModifyTodo = (todo: Todo) =>
-    isOwner(todo) || currentUser.role === Role.ADMIN;
-
-  const handleDelete = (todoId: number) => {
-    const updatedTodos = todos.filter((todo) => todo.id !== todoId);
-    setTodos(updatedTodos);
   };
 
-  const handleEdit = (updatedTodo: Todo) => {
-    const updatedTodos = todos.map((todo) =>
-      todo.id === updatedTodo.id ? updatedTodo : todo
-    );
-    setTodos(updatedTodos);
+  const handleEditTodo = async (id: number, updateData: Partial<Todo>) => {
+    try {
+      const response = await updateTodo(id, updateData);
+      if (response.success) {
+        setTodos((prev) =>
+          prev.map((todo) =>
+            todo.id === id ? { ...todo, ...response.data } : todo
+          )
+        );
+        toast.success("Task updated");
+      }
+    } catch {
+      toast.error("Error updating task");
+    }
   };
 
-  const handleAddTodo = (newTodo: Todo) => {
-    setTodos([...todos, newTodo]);
+  const handleDeleteTodo = async (id: number) => {
+    try {
+      const response = await deleteTodo(id);
+      if (response.success) {
+        setTodos((prev) => prev.filter((todo) => todo.id !== id));
+        toast.success("Task deleted");
+      }
+    } catch {
+      toast.error("Error deleting task");
+    }
   };
 
   return (
     <div className="space-y-4">
-      {/* Notifications */}
-      {notifications.length > 0 && (
-        <div className="mb-4 p-4 bg-blue-100 text-blue-700 rounded">
-          {notifications.map((note, index) => (
-            <p key={index}>{note}</p>
+      <div className="flex justify-between items-center mb-4">
+        <Input
+          type="text"
+          placeholder="Search tasks..."
+          onChange={handleSearchChange}
+          className="w-1/3"
+        />
+        <div className="flex items-center gap-2">
+          <Select
+            value={filters.sortBy}
+            onValueChange={(value) =>
+              setFilters((prev) => ({ ...prev, sortBy: value }))
+            }
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sort By" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="dueDate">Due Date</SelectItem>
+              <SelectItem value="priority">Priority</SelectItem>
+              <SelectItem value="createdAt">Created At</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Status Filter */}
+          <Select
+            value={filters.status}
+            onValueChange={(value) =>
+              setFilters((prev) => ({
+                ...prev,
+                status: value as Status | undefined,
+              }))
+            }
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={Status.TODO}>Todo</SelectItem>
+              <SelectItem value={Status.DONE}>Done</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Priority Filter */}
+          <Select
+            value={filters.priority}
+            onValueChange={(value) =>
+              setFilters((prev) => ({
+                ...prev,
+                priority: value as Priority | undefined,
+              }))
+            }
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by Priority" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={Priority.HIGH}>High</SelectItem>
+              <SelectItem value={Priority.MEDIUM}>Medium</SelectItem>
+              <SelectItem value={Priority.LOW}>Low</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button onClick={() => setShowAddTodo(true)} variant="secondary">
+            <Plus className="mr-2 h-4 w-4" /> New Task
+          </Button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center my-4">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {todos.map((todo) => (
+            <TodoCard
+              key={todo.id}
+              todo={todo}
+              currentUser={currentUser}
+              onEdit={handleEditTodo}
+              onDelete={handleDeleteTodo}
+            />
           ))}
         </div>
       )}
 
-      {/* Add New Todo Button */}
-      <div className="flex justify-end">
-        <Button onClick={() => setShowAddTodo(true)}>Add New Todo</Button>
-      </div>
-
-      {/* Add Todo Dialog */}
       <Dialog open={showAddTodo} onOpenChange={setShowAddTodo}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Add New Todo</DialogTitle>
           </DialogHeader>
-          <AddTodoForm
-            onAdd={(todo) => {
-              handleAddTodo(todo);
-              setShowAddTodo(false);
-            }}
-          />
+          <AddTodoForm onAdd={handleAddTodo} />
         </DialogContent>
       </Dialog>
-
-      {/* Search, Sort, Filter */}
-      <div className="flex justify-between items-center mb-4">
-        <input
-          type="text"
-          placeholder="Search todos..."
-          className="border p-2 rounded w-1/3"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <div className="flex items-center gap-2">
-          <select
-            className="border p-2 rounded"
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-          >
-            <option value="">Sort By</option>
-            <option value="dueDate">Due Date</option>
-            <option value="priority">Priority</option>
-          </select>
-          <select
-            className="border p-2 rounded"
-            value={filterOption}
-            onChange={(e) => setFilterOption(e.target.value)}
-          >
-            <option value="">Filter</option>
-            <option value="status">Status</option>
-            <option value="creationDate">Creation Date</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Todo List */}
-      <div className="grid gap-4">
-        {sortedTodos.map((todo) => (
-          <Card key={todo.id} className="shadow-sm">
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div className="space-y-1">
-                  <CardTitle className="flex items-center gap-2">
-                    {todo.title}
-                    <Badge className={getPriorityClass(todo.priority)}>
-                      {todo.priority}
-                    </Badge>
-                  </CardTitle>
-                  <CardDescription>{todo.description}</CardDescription>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-6 w-6">
-                    <AvatarFallback>{todo.owner.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm text-gray-500">
-                    {todo.owner.name}
-                  </span>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <div className="flex items-center gap-1">
-                  <CalendarIcon className="h-4 w-4" />
-                  Due: {new Date(todo.dueDate).toLocaleDateString()}
-                </div>
-                {todo.attachment && (
-                  <div className="flex items-center gap-1">
-                    <PaperclipIcon className="h-4 w-4" />
-                    <a href={todo.filePath} download className="underline">
-                      {todo.attachment}
-                    </a>
-                  </div>
-                )}
-                <Badge
-                  variant={
-                    todo.status === Status.DONE ? "secondary" : "default"
-                  }
-                >
-                  {todo.status}
-                </Badge>
-              </div>
-            </CardContent>
-            {canModifyTodo(todo) && (
-              <CardFooter className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    console.log("Edit functionality not implemented")
-                  }
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(todo.id)}
-                >
-                  Delete
-                </Button>
-              </CardFooter>
-            )}
-          </Card>
-        ))}
-      </div>
     </div>
   );
-};
-
-const getPriorityClass = (priority: Priority): string => {
-  const classes: Record<Priority, string> = {
-    [Priority.HIGH]: "bg-red-500 text-white",
-    [Priority.MEDIUM]: "bg-yellow-500 text-white",
-    [Priority.LOW]: "bg-green-500 text-white",
-  };
-  return classes[priority] || "bg-gray-500 text-white";
-};
-
-export default TaskList;
+}

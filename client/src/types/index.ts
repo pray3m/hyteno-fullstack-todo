@@ -19,7 +19,6 @@ export interface User {
   email: string;
   role: Role;
   name: string;
-  avatar?: string | null;
 }
 
 export interface Todo {
@@ -29,16 +28,34 @@ export interface Todo {
   dueDate: string;
   priority: Priority;
   status: Status;
-  attachment?: string | null;
-  imageUrl?: string | null;
-  filePath?: string | null;
-  createdAt?: string;
+  imageUrl: string | null;
+  fileName: string | null;
+  filePath: string | null;
+  createdAt: string;
+  userId: number;
   user?: User;
 }
-
 export interface Notification {
   id: number;
   message: string;
   isRead: boolean;
   createdAt: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  error?: string;
+}
+
+export interface TodoFilters {
+  search?: string;
+  sortBy?: "dueDate" | "priority" | "createdAt";
+  sortOrder?: "asc" | "desc";
+  status?: Status;
+  priority?: Priority;
+  startDate?: string;
+  endDate?: string;
+  userId?: number;
 }

@@ -60,6 +60,10 @@ export class TodosService {
       where.status = query.status;
     }
 
+    if (query.priority) {
+      where.priority = query.priority;
+    }
+
     if (query.startDate || query.endDate) {
       where.dueDate = {};
       if (query.startDate) where.dueDate.gte = new Date(query.startDate);
