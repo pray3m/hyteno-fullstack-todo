@@ -1,4 +1,3 @@
-````markdown
 # Hyteno Fullstack Todo Application
 
 A feature-rich Todo app with Role-Based Access Control (RBAC), file uploads, search & filter, and notifications. Frontend deployed on Vercel and backend on a VPS.
