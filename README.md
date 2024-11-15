@@ -13,11 +13,11 @@ A slick Todo app with Role-Based Access Control (RBAC), file uploads, search & f
 
 - **Admin**
 
-  - **Email:** admin@hy.petgomania.com.co
+  - **Email:** admin@hy.com
   - **Password:** password
 
 - **User**
-  - **Email:** user@hy.petgomania.com.co
+  - **Email:** user@hy.com
   - **Password:** password
 
 > _These credentials are seeded for testing purposes. Feel free to create your own!_
