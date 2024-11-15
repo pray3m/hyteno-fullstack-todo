@@ -24,7 +24,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import TodoForm, { TodoFormData } from "./TodoForm";
-import EmptyIllustration from "./EmptyIllustration";
+import EmptyIllustration from "../../components/shared/EmptyIllustration";
 import TodoCard from "./TodoCard";
 import { motion, AnimatePresence } from "framer-motion";
 
