@@ -320,6 +320,7 @@ export default function TaskList({ currentUser }: TaskListProps) {
                 await handleEditTodo(todoToEdit.id, data);
               }}
               isEdit={true}
+              isLoading={loading}
             />
           </DialogContent>
         </Dialog>
