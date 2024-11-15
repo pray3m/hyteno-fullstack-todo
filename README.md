@@ -121,13 +121,11 @@ A slick Todo app with Role-Based Access Control (RBAC), file uploads, search & f
 
 ## 📸 Project Screenshots
 
-![Dashboard](./screenshots/dashboard.png)
+![Todo List](./screenshots/ss3.png)
 
-![Todo List](./screenshots/todo-list.png)
+![Dashboard](./screenshots/ss2.png)
 
-![File Upload](./screenshots/file-upload.png)
-
-![Notifications](./screenshots/notifications.png)
+![Todo Form](./screenshots/ss1.png)
 
 ## 📫 Contact
 
