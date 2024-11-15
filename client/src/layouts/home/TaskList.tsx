@@ -1,3 +1,10 @@
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   createTodo,
@@ -5,28 +12,15 @@ import {
   getTodos,
   updateTodo,
 } from "@/services/todoService";
-import { Status, Todo, User, Priority } from "@/types";
+import { Priority, Status, Todo, User } from "@/types";
+import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import {
-  DialogHeader,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import TodoForm, { TodoFormData } from "./TodoForm";
 import EmptyIllustration from "../../components/shared/EmptyIllustration";
+import FilterSection from "./FilterSection";
 import TodoCard from "./TodoCard";
-import { motion, AnimatePresence } from "framer-motion";
+import TodoForm, { TodoFormData } from "./TodoForm";
 
 interface TaskListProps {
   currentUser: User;
@@ -40,12 +34,20 @@ export default function TaskList({ currentUser }: TaskListProps) {
   const [todoToEdit, setTodoToEdit] = useState<Todo | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState({
+
+  // Adjust filters type for consistency
+  const [filters, setFilters] = useState<{
+    search: string;
+    sortBy: string;
+    sortOrder: string;
+    status?: Status;
+    priority?: Priority;
+  }>({
     search: "",
     sortBy: "dueDate",
     sortOrder: "asc",
-    status: undefined as Status | undefined,
-    priority: undefined as Priority | undefined,
+    status: undefined,
+    priority: undefined,
   });
 
   useEffect(() => {
@@ -187,68 +189,7 @@ export default function TaskList({ currentUser }: TaskListProps) {
 
       <AnimatePresence>
         {showFilters && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="overflow-hidden"
-          >
-            <div className="flex flex-wrap gap-4 items-center bg-secondary p-4 rounded-lg">
-              <Select
-                value={filters.sortBy}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({ ...prev, sortBy: value }))
-                }
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Sort By" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="dueDate">Due Date</SelectItem>
-                  <SelectItem value="priority">Priority</SelectItem>
-                  <SelectItem value="createdAt">Created At</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={filters.status}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    status: value as Status | undefined,
-                  }))
-                }
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={Status.TODO}>Todo</SelectItem>
-                  <SelectItem value={Status.DONE}>Done</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={filters.priority}
-                onValueChange={(value) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    priority: value as Priority | undefined,
-                  }))
-                }
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by Priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={Priority.HIGH}>High</SelectItem>
-                  <SelectItem value={Priority.MEDIUM}>Medium</SelectItem>
-                  <SelectItem value={Priority.LOW}>Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </motion.div>
+          <FilterSection filters={filters} setFilters={setFilters} />
         )}
       </AnimatePresence>
 
