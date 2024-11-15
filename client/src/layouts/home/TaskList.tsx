@@ -81,19 +81,30 @@ export default function TaskList({ currentUser }: TaskListProps) {
   };
 
   const handleAddTodo = async (todoData: TodoFormData, file?: File) => {
+    setLoading(true);
     try {
       const response = await createTodo({ ...todoData, file });
       if (response.success) {
-        setTodos((prev) => [...prev, response.data]);
+        // Optimistic update
+        setTodos((prev) => [
+          ...prev,
+          {
+            ...response.data,
+            user: currentUser, // Attach current user details
+          },
+        ]);
         toast.success("Todo added successfully");
         setShowAddTodo(false);
       }
     } catch {
       toast.error("Error adding task");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleEditTodo = async (id: number, updateData: TodoFormData) => {
+    setLoading(true);
     try {
       const response = await updateTodo(id, updateData);
       if (response.success) {
@@ -108,6 +119,8 @@ export default function TaskList({ currentUser }: TaskListProps) {
       }
     } catch {
       toast.error("Error updating task");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -286,7 +299,7 @@ export default function TaskList({ currentUser }: TaskListProps) {
           <DialogHeader>
             <DialogTitle>Add New Todo</DialogTitle>
           </DialogHeader>
-          <TodoForm onSubmit={handleAddTodo} />
+          <TodoForm onSubmit={handleAddTodo} isLoading={loading} />
         </DialogContent>
       </Dialog>
 

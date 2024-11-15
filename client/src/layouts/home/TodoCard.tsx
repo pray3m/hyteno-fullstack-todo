@@ -67,7 +67,7 @@ export default function TodoCard({
               </span>
             </h3>
             <p className="text-sm text-muted-foreground truncate">
-              Created by: {todo.user?.name || "Unknown"}
+              Created by: {todo.user?.name || currentUser.name || "Unknown"}
             </p>
           </div>
         </div>
