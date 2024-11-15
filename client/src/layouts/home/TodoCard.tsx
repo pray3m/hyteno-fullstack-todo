@@ -37,14 +37,21 @@ export default function TodoCard({
   const canModify = isOwner || isAdmin;
 
   const priorityStyles = {
-    HIGH: "text-red-700 bg-red-100 border-red-300",
-    MEDIUM: "text-orange-700 bg-orange-100 border-orange-300",
-    LOW: "text-green-700 bg-green-100 border-green-300",
+    HIGH: "text-red-700 bg-red-100 border-red-300 hover:bg-red-200 hover:text-red-800",
+    MEDIUM:
+      "text-orange-700 bg-orange-100 border-orange-300 hover:bg-orange-200 hover:text-orange-800",
+    LOW: "text-green-700 bg-green-100 border-green-300 hover:bg-green-200 hover:text-green-800",
+    DEFAULT:
+      "text-gray-700 bg-gray-100 border-gray-300 hover:bg-gray-200 hover:text-gray-800",
   };
 
   const statusStyles = {
-    [Status.TODO]: "bg-blue-100 text-blue-700 border-blue-300",
-    [Status.DONE]: "bg-green-100 text-green-700 border-green-300",
+    [Status.TODO]:
+      "bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200 hover:text-blue-800",
+    [Status.DONE]:
+      "bg-green-100 text-green-700 border-green-300 hover:bg-green-200 hover:text-green-800",
+    DEFAULT:
+      "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200 hover:text-gray-800",
   };
 
   return (

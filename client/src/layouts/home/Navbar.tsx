@@ -160,10 +160,10 @@ const Navbar: React.FC<NavbarProps> = ({ setShowUserManagement }) => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="p-2 text-sm">
-                  <p className="font-medium truncate">{currentUser?.email}</p>
-                  <p className="text-gray-500 text-xs">
-                    {currentUser?.role.toLowerCase()}
-                  </p>
+                  <p className="font-medium truncate">{currentUser?.name}</p>
+                  <p className="text-gray-500 truncate">{currentUser?.email}</p>
+
+                  <p className="text-gray-500 text-xs">{currentUser?.role}</p>
                 </div>
                 <DropdownMenuSeparator />
                 {currentUser?.role === Role.ADMIN && (

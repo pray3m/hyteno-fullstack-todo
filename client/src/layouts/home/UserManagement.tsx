@@ -101,7 +101,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
                           {user.email.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="hidden sm:inline">{user.email}</span>
+                      <span className="hidden sm:inline">{user.name}</span>
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
