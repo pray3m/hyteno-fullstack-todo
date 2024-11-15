@@ -60,28 +60,28 @@ const Navbar: React.FC<NavbarProps> = ({ setShowUserManagement }) => {
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <nav className="bg-white border-b">
+    <nav className="bg-white border-b sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo and Title */}
           <div className="flex items-center space-x-4">
-            <div className="bg-blue-600 p-2 rounded-lg">
+            <div className="bg-blue-600 p-2 rounded-lg transform transition-transform duration-200 hover:scale-110">
               <Settings className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent hidden sm:block">
               Todo Manager
             </h1>
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-4">
             {/* Notifications */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative hover:bg-gray-100 rounded-full w-10 h-10"
+                  className="relative hover:bg-gray-100 rounded-full w-10 h-10 transition-colors duration-200"
                 >
                   <Bell className="h-5 w-5 text-gray-600" />
                   {unreadCount > 0 && (
@@ -134,7 +134,7 @@ const Navbar: React.FC<NavbarProps> = ({ setShowUserManagement }) => {
               <Button
                 variant="outline"
                 onClick={() => setShowUserManagement(true)}
-                className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+                className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors duration-200 hidden sm:flex"
               >
                 <Users className="h-4 w-4 mr-2" />
                 Manage Users
@@ -146,7 +146,7 @@ const Navbar: React.FC<NavbarProps> = ({ setShowUserManagement }) => {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-10 w-10 rounded-full hover:bg-gray-100"
+                  className="relative h-10 w-10 rounded-full hover:bg-gray-100 transition-colors duration-200"
                 >
                   <Avatar className="h-9 w-9 border-2 border-gray-200">
                     <AvatarImage
@@ -166,6 +166,15 @@ const Navbar: React.FC<NavbarProps> = ({ setShowUserManagement }) => {
                   </p>
                 </div>
                 <DropdownMenuSeparator />
+                {currentUser?.role === Role.ADMIN && (
+                  <DropdownMenuItem
+                    onClick={() => setShowUserManagement(true)}
+                    className="sm:hidden"
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    Manage Users
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   onClick={handleLogout}
                   className="text-red-600 focus:text-red-600 focus:bg-red-50"

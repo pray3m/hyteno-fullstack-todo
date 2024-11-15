@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,15 +7,14 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Role, Status, Todo, User as UserType } from "@/types";
 import { format } from "date-fns";
 import {
   Calendar,
   CheckCircle,
-  Trash2,
   Edit3,
   PaperclipIcon,
+  Trash2,
 } from "lucide-react";
 
 interface TodoCardProps {
@@ -48,10 +48,10 @@ export default function TodoCard({
   };
 
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
-      <CardHeader className="pb-2">
-        <div className="flex items-center space-x-4">
-          <Avatar className="h-10 w-10">
+    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full">
+      <CardHeader className="pb-2 space-y-2 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+          <Avatar className="h-10 w-10 mb-2 sm:mb-0">
             <AvatarImage
               src={`https://avatar.vercel.sh/${todo.user?.email}.png`}
               alt={todo.user?.name || "User avatar"}
@@ -60,19 +60,24 @@ export default function TodoCard({
               {todo.user?.name?.charAt(0).toUpperCase() || "U"}
             </AvatarFallback>
           </Avatar>
-          <div className="space-y-1">
-            <h3 className="text-lg font-semibold leading-none tracking-tight">
-              {todo.title}
+          <div className="space-y-1 flex-grow min-w-0">
+            <h3 className="text-lg font-semibold leading-tight tracking-tight truncate w-full">
+              <span className="block whitespace-normal break-words">
+                {todo.title}
+              </span>
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground truncate">
               Created by: {todo.user?.name || "Unknown"}
             </p>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pb-2">
-        <p className="text-sm text-gray-700 mb-4">{todo.description}</p>
-        <div className="flex flex-wrap gap-2 mb-4">
+
+      <CardContent className="pb-2 flex-grow space-y-4">
+        <p className="text-sm text-gray-700 mb-4 line-clamp-3">
+          {todo.description}
+        </p>
+        <div className="flex flex-wrap gap-2">
           <Badge className={`${statusStyles[todo.status]} px-2 py-1`}>
             {todo.status === Status.DONE ? "Done" : "Todo"}
           </Badge>
@@ -80,7 +85,7 @@ export default function TodoCard({
             {todo.priority} Priority
           </Badge>
         </div>
-        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 text-sm text-muted-foreground">
           <div className="flex items-center">
             <Calendar className="mr-2 h-4 w-4" />
             <span>{format(new Date(todo.dueDate), "MMM dd, yyyy")}</span>
@@ -93,7 +98,6 @@ export default function TodoCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline truncate max-w-[120px]"
-                title={todo.fileName || "Attachment"}
               >
                 {todo.fileName?.length > 15
                   ? `${todo.fileName.slice(0, 12)}...`
@@ -103,8 +107,9 @@ export default function TodoCard({
           )}
         </div>
       </CardContent>
+
       {canModify && (
-        <CardFooter className="flex justify-end space-x-2 pt-2">
+        <CardFooter className="flex flex-wrap justify-end gap-2 pt-2">
           <Button
             onClick={() => onEdit(todo)}
             variant="outline"
@@ -124,7 +129,11 @@ export default function TodoCard({
               Mark as Done
             </Button>
           )}
-          <Button onClick={() => onDelete(todo.id)} variant="secondary" size="sm">
+          <Button
+            onClick={() => onDelete(todo.id)}
+            variant="secondary"
+            size="sm"
+          >
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
           </Button>

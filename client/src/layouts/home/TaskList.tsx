@@ -144,8 +144,8 @@ export default function TaskList({ currentUser }: TaskListProps) {
 
   return (
     <div className="space-y-6 p-4 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-        <div className="relative w-full md:w-1/3">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="relative w-full sm:w-1/2 lg:w-1/3">
           <Input
             type="text"
             placeholder="Search tasks..."
@@ -154,18 +154,18 @@ export default function TaskList({ currentUser }: TaskListProps) {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
         </div>
-        <div className="flex items-center gap-2 w-full md:w-auto">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <Button
             onClick={() => setShowFilters(!showFilters)}
             variant="outline"
-            className="w-full md:w-auto"
+            className="w-full sm:w-auto"
           >
             <SlidersHorizontal className="mr-2 h-4 w-4" />
             Filters
           </Button>
           <Button
             onClick={() => setShowAddTodo(true)}
-            className="w-full md:w-auto"
+            className="w-full sm:w-auto"
           >
             <Plus className="mr-2 h-4 w-4" /> New Task
           </Button>
@@ -247,7 +247,7 @@ export default function TaskList({ currentUser }: TaskListProps) {
         <div className="flex flex-col items-center justify-center my-16">
           <EmptyIllustration />
           <h2 className="text-2xl font-semibold mb-2">No tasks found</h2>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-muted-foreground mb-4 text-center">
             Start by adding a new task or adjusting your filters.
           </p>
           <Button onClick={() => setShowAddTodo(true)}>
